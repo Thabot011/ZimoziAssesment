@@ -102,7 +102,8 @@ namespace Web
                         ValidIssuer = $"https://securetoken.google.com/{firebaseProjectName}",
                         ValidateAudience = true,
                         ValidAudience = firebaseProjectName,
-                        ValidateLifetime = false
+                        ValidateLifetime = false,
+                        RequireExpirationTime = false
                     };
                 });
 
