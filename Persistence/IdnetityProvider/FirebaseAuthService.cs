@@ -22,23 +22,41 @@ namespace Persistence.IdnetityProvider
         {
             var decodedToken = await FirebaseAuth.DefaultInstance.VerifyIdTokenAsync(idToken);
             var uid = decodedToken.Uid;
-            var email = decodedToken.Claims.FirstOrDefault(x => x.Key == "email").Value.ToString();
-
+            string name = decodedToken.Claims.FirstOrDefault(x => x.Key == "name").Value.ToString();
+            string email = decodedToken.Claims.FirstOrDefault(x => x.Key == "email").Value.ToString();
+            string userId = string.Empty;
             using (var scope = _serviceProvider.CreateScope())
             {
                 var userRepository = scope.ServiceProvider.GetRequiredService<IUserRepository>();
                 var user = await userRepository.GetUserByUserIdentity(uid);
                 if (user == null)
                 {
-                    var userId = await userRepository.AddUser(new Domain.Entities.User
+                    userId = await userRepository.AddUser(new Domain.Entities.User
                     {
                         FullName = "",
                         Email = email,
                         UserId = uid,
+                        Role = Domain.Entities.UserRole.NormalUser
+                    });
+
+                    var claims = new Dictionary<string, object>
+            {
+            { "role", Domain.Entities.UserRole.NormalUser }
+        };
+                    await FirebaseAuth.DefaultInstance.SetCustomUserClaimsAsync(uid, claims);
+                    await FirebaseAuth.DefaultInstance.UpdateUserAsync(new UserRecordArgs
+                    {
+                        Uid = uid,
+                        Email = email,
+                        Password = "123456",
                     });
                 }
 
-                return new UserDto { Email = user.Email, FullName = user.FullName, Id = user.Id, Role = (Contracts.User.UserRole)user.Role, UserId = user.UserId, Token = idToken };
+                var cred = await _firebaseAuth.SignInWithEmailAndPasswordAsync(email, "123456");
+                string token = await cred.User.GetIdTokenAsync();
+
+
+                return new UserDto { Email = email, FullName = name, Id = userId, Role = Contracts.User.UserRole.NormalUser, UserId = uid, Token = token };
             }
         }
 
