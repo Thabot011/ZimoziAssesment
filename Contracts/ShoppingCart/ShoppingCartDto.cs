@@ -9,6 +9,6 @@ namespace Contracts.ShoppingCart
         public double? TotalPrice { get; set; }
         public UserDto? User { get; set; }
         public List<string>? ProductIds { get; set; }
-        public List<ProductDto> Products { get; set; }
+        public List<ProductDto>? Products { get; set; }
     }
 }
