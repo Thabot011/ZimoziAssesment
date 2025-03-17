@@ -26,7 +26,7 @@ namespace Web
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            string pathToServiceAccountKey = "zimozi-ac7c3-firebase-adminsdk-fbsvc-451e034047.json";
+            string pathToServiceAccountKey = "zimozi-ac7c3-firebase-adminsdk-fbsvc-47a2ee972d.json";
             Environment.SetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS", pathToServiceAccountKey);
             builder.Services.AddSingleton(FirebaseApp.Create(new AppOptions()
             {
@@ -137,8 +137,12 @@ namespace Web
             });
 
             app.UseHttpsRedirection();
-            app.UseCors(x => x.AllowAnyHeader().AllowAnyMethod().WithOrigins("http://localhost:3000"));
+
+            app.UseRouting();
+            app.UseCors(x => x.AllowAnyHeader().AllowAnyMethod().WithOrigins("http://localhost:3000", "https://zimozi-ac7c3.web.app"));
+
             app.UseAuthentication();
+
             app.UseAuthorization();
             app.UseMiddleware<ExceptionHandlingMiddleware>();
 
