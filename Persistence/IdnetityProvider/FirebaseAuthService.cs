@@ -55,6 +55,8 @@ namespace Persistence.IdnetityProvider
                 var cred = await _firebaseAuth.SignInWithEmailAndPasswordAsync(email, "123456");
                 string token = await cred.User.GetIdTokenAsync();
 
+                userId = !string.IsNullOrEmpty(userId) ? userId : user.Id;
+
 
                 return new UserDto { Email = email, FullName = name, Id = userId, Role = Contracts.User.UserRole.NormalUser, UserId = uid, Token = token };
             }
